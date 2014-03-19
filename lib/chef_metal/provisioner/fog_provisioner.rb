@@ -388,11 +388,19 @@ module ChefMetal
         else
           username = compute_options[:ssh_username] || 'root'
         end
+        connect_to = nil 
+        if compute_options[:private_ip]
+          connect_to = server.private_ip_address 
+        else
+          connect_to = server.public_ip_address 
+        end
+
+          
         options = {}
         if compute_options[:sudo] || (!compute_options.has_key?(:sudo) && username != 'root')
           options[:prefix] = 'sudo '
         end
-        ChefMetal::Transport::SSH.new(server.public_ip_address, username, ssh_options, options)
+        ChefMetal::Transport::SSH.new(connect_to, username, ssh_options, options)
       end
 
       def wait_until_ready(server, timeout)
